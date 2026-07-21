@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>みらい設計エンジニアリング 社内ポータル（演習用）</title>
+<style>
+  body { font-family: "Meiryo", "Yu Gothic", sans-serif; margin: 0; background: #f4f6f8; color: #222; }
+  header { background: #1f4e79; color: #fff; padding: 16px 24px; }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+  main { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+  section { background: #fff; border: 1px solid #d6dbe0; border-radius: 6px; padding: 20px; margin-bottom: 24px; }
+  h2 { font-size: 17px; margin: 0 0 14px; border-left: 5px solid #1f4e79; padding-left: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { border: 1px solid #cfd6dc; padding: 7px 9px; text-align: left; }
+  th { background: #e8eef4; }
+  tbody tr:nth-child(even) { background: #fafbfc; }
+  #loading { color: #888; font-size: 14px; padding: 12px 0; }
+  .form-row { margin-bottom: 12px; }
+  label { display: block; font-size: 13px; margin-bottom: 4px; font-weight: bold; }
+  input[type=text], select, textarea { width: 100%; padding: 7px; border: 1px solid #b9c2cb; border-radius: 4px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+  textarea { height: 70px; }
+  button { background: #1f4e79; color: #fff; border: 0; padding: 10px 22px; border-radius: 4px; font-size: 14px; cursor: pointer; }
+  button:hover { background: #2a6396; }
+  #result { margin-top: 14px; padding: 12px; background: #e6f4ea; border: 1px solid #9ccfae; border-radius: 4px; font-size: 14px; display: none; }
+  #result > div { margin: 2px 0; }
+  #receiptNo { font-weight: bold; font-size: 15px; }
+  .note { font-size: 12px; color: #777; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>みらい設計エンジニアリング 社内ポータル</h1>
+  <p>設計変更申請 管理システム（Day2 演習用の練習ページです）</p>
+</header>
+
+<main>
+
+  <section>
+    <h2>設計変更申請 一覧</h2>
+    <p id="loading">読み込み中です。しばらくお待ちください...</p>
+    <table id="applicationTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>申請ID</th><th>申請日</th><th>申請者</th><th>案件コード</th>
+          <th>変更種別</th><th>影響度</th><th>ステータス</th>
+        </tr>
+      </thead>
+      <tbody id="applicationBody"></tbody>
+    </table>
+    <p class="note">※ この一覧は、ページを開いてから約 1.5 秒後に表示されます。</p>
+  </section>
+
+  <section>
+    <h2>設計変更申請 新規登録</h2>
+    <div class="form-row">
+      <label for="applicant">申請者氏名</label>
+      <input type="text" id="applicant" name="applicant">
+    </div>
+    <div class="form-row">
+      <label for="projectCode">案件コード</label>
+      <select id="projectCode" name="projectCode">
+        <option value="">選択してください</option>
+        <option value="P001">P001 新型搬送装置設計</option>
+        <option value="P002">P002 制御盤更新設計</option>
+        <option value="P003">P003 治具設計改善</option>
+        <option value="P004">P004 配管ルート再設計</option>
+        <option value="P005">P005 検査装置設計</option>
+        <option value="P006">P006 省エネ改修設計</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="changeType">変更種別</label>
+      <select id="changeType" name="changeType">
+        <option value="">選択してください</option>
+        <option value="仕様変更">仕様変更</option>
+        <option value="部品変更">部品変更</option>
+        <option value="図面修正">図面修正</option>
+        <option value="コスト変更">コスト変更</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="impact">影響度</label>
+      <select id="impact" name="impact">
+        <option value="">選択してください</option>
+        <option value="高">高</option>
+        <option value="中">中</option>
+        <option value="低">低</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="summary">変更概要</label>
+      <textarea id="summary" name="summary"></textarea>
+    </div>
+    <button type="button" id="submitBtn">申請を登録する</button>
+    <div id="result">
+      <div id="resultMessage"></div>
+      <div id="receiptRow">受付番号: <span id="receiptNo"></span></div>
+      <div id="resultDetail"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  var applications = [
+    ["A001","2026-06-01","中村 彩","P001","図面修正","中","承認済"],
+    ["A002","2026-06-02","加藤 美穂","P006","仕様変更","高","承認済"],
+    ["A003","2026-06-03","中村 彩","P003","部品変更","中","申請中"],
+    ["A004","2026-06-05","小林 健太","P002","コスト変更","低","承認済"],
+    ["A005","2026-06-06","山本 拓也","P004","図面修正","高","却下"],
+    ["A006","2026-06-08","加藤 美穂","P006","図面修正","中","承認待ち"],
+    ["A007","2026-06-10","中村 彩","P001","仕様変更","高","申請中"],
+    ["A008","2026-06-11","小林 健太","P002","部品変更","低","承認済"],
+    ["A009","2026-06-12","山本 拓也","P004","コスト変更","中","申請中"],
+    ["A010","2026-06-15","渡辺 翔","P005","仕様変更","中","承認待ち"],
+    ["A011","2026-06-16","加藤 美穂","P006","部品変更","低","承認済"],
+    ["A012","2026-06-18","中村 彩","P003","図面修正","低","申請中"]
+  ];
+
+  // わざと 1.5 秒遅らせて表示する（PAD の「待機」を学ぶため）
+  setTimeout(function () {
+    var body = document.getElementById("applicationBody");
+    var html = "";
+    for (var i = 0; i < applications.length; i++) {
+      html += "<tr>";
+      for (var j = 0; j < applications[i].length; j++) {
+        html += "<td>" + applications[i][j] + "</td>";
+      }
+      html += "</tr>";
+    }
+    body.innerHTML = html;
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("applicationTable").style.display = "table";
+  }, 1500);
+
+  var submitCount = 0;
+  document.getElementById("submitBtn").addEventListener("click", function () {
+    var applicant = document.getElementById("applicant").value;
+    var project   = document.getElementById("projectCode").value;
+    var type      = document.getElementById("changeType").value;
+    var impact    = document.getElementById("impact").value;
+    var result    = document.getElementById("result");
+    var message   = document.getElementById("resultMessage");
+    var receiptRow= document.getElementById("receiptRow");
+    var receiptNo = document.getElementById("receiptNo");
+    var detail    = document.getElementById("resultDetail");
+
+    if (applicant === "" || project === "" || type === "" || impact === "") {
+      result.style.background = "#fdecea";
+      result.style.borderColor = "#e0a3a3";
+      message.textContent = "入力エラー: 申請者氏名・案件コード・変更種別・影響度は必須です。";
+      receiptNo.textContent = "";
+      receiptRow.style.display = "none";
+      detail.textContent = "";
+      result.style.display = "block";
+      return;
+    }
+
+    submitCount++;
+    var num = "R-" + ("000" + submitCount).slice(-4);
+    result.style.background = "#e6f4ea";
+    result.style.borderColor = "#9ccfae";
+    message.textContent = "登録が完了しました。";
+    receiptNo.textContent = num;
+    receiptRow.style.display = "block";
+    detail.textContent = "申請者: " + applicant + " / 案件: " + project
+                       + " / 種別: " + type + " / 影響度: " + impact;
+    result.style.display = "block";
+  });
+</script>
+
+</body>
+</html>
