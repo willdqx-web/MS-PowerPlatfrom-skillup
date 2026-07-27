@@ -1,0 +1,13 @@
+社員ID,氏名,部署コード,役割,メール
+E101,田中 誠,D01,課長,tanaka@example.com
+E102,山本 拓也,D01,設計担当,yamamoto@example.com
+E103,中村 彩,D01,設計補助,nakamura@example.com
+E104,佐藤 由美,D02,課長,sato@example.com
+E105,小林 健太,D02,設計担当,kobayashi@example.com
+E106,加藤 美穂,D02,設計補助,kato@example.com
+E107,鈴木 一郎,D03,部長,suzuki@example.com
+E108,渡辺 翔,D03,品証担当,watanabe@example.com
+E109,高橋 直樹,D04,部長,takahashi@example.com
+E110,松本 真理,D04,生技担当,matsumoto@example.com
+E111,伊藤 香織,D05,部長,ito@example.com
+E112,井上 大和,D05,総務担当,inoue@example.com
